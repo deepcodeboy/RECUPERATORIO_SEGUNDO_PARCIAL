@@ -1,0 +1,53 @@
+version: '3.1'
+
+services:
+
+  mongo_db_service:
+    image: mongo:6.0
+    ports:
+      - 27017:27017
+    volumes:
+      - ./bd/mongo:/data/db
+
+  maria_db_service:
+    image: mariadb:10.6.14
+    ports:
+      - 3307:3306
+    environment:
+      - MARIADB_ROOT_PASSWORD=$MARIADB_ROOT_PASSWORD
+    volumes:
+      - ./bd/maria:/var/lib/mysql
+
+  mysql_db_service:
+    image: mysql:8.0.33
+    ports:
+      - 3309:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+    volumes:
+      - ./bd/mysql:/var/lib/mysql
+
+
+  my_express:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 3000:5000
+    environment:
+      - MONGO_DB_HOST=mongo_db_service
+
+      - MARIADB_HOST=maria_db_service
+      - MARIADB_USER=root
+      - MARIADB_PASSWORD=$MARIADB_ROOT_PASSWORD
+
+      - MYSQL_HOST=mysql_db_service
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
+
+    volumes:
+      - ./server:/recuperatorio_segundo_parcial
+      - /segundo_parcial/node_modules
+
+    
+  
